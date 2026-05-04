@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NUEVA FRONTERA | CENTRAL HUB</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #050505;
+            --card: #0d0d0d;
+            --accent: #ff0000;
+            --gold: #d4af37;
+            --border: #222;
+            --text: #eee;
+            --defcon-color: #ff0000;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Roboto Mono', monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .main-container {
+            width: 450px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            box-shadow: 0 0 60px rgba(0,0,0,1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Navigazione Tabs */
+        .tabs {
+            display: flex;
+            background: #111;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .tab {
+            flex: 1;
+            padding: 12px 5px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 10px;
+            font-weight: bold;
+            color: #444;
+            text-transform: uppercase;
+            transition: 0.3s;
+            border-bottom: 2px solid transparent;
+        }
+
+        .tab.active {
+            color: var(--gold);
+            background: #1a1a1a;
+            border-bottom: 2px solid var(--gold);
+        }
+
+        /* Contenuto */
+        .gui-content {
+            padding: 25px;
+            display: none;
+            min-height: 480px;
+        }
+
+        .gui-content.active {
+            display: block;
+            animation: fadeIn 0.2s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; } to { opacity: 1; }
+        }
+
+        .header-title { text-align: center; margin-bottom: 20px; }
+        .header-title h1 { font-size: 16px; letter-spacing: 3px; color: var(--gold); margin: 0; }
+
+        .label { font-size: 10px; color: #666; text-transform: uppercase; display: block; margin-bottom: 5px; margin-top: 15px; }
+
+        input, select {
+            width: 100%;
+            background: #151515;
+            border: 1px solid var(--border);
+            color: #fff;
+            padding: 10px;
+            font-family: inherit;
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        input:focus { border-color: var(--gold); }
+
+        .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+        .result-panel {
+            margin-top: 25px;
+            padding: 15px;
+            border-left: 4px solid var(--accent);
+            background: rgba(255, 0, 0, 0.05);
+        }
+
+        .res-title { font-size: 9px; color: #888; text-transform: uppercase; }
+        .res-value { font-size: 28px; font-weight: bold; margin-top: 5px; color: #fff; }
+
+        /* DEFCON Styling */
+        #defconSelect { font-weight: bold; text-align: center; }
+        .def-1 { color: #ff0000; border-color: #ff0000; }
+        .def-2 { color: #ff6600; border-color: #ff6600; }
+        .def-3 { color: #ffcc00; border-color: #ffcc00; }
+        .def-4 { color: #99ff00; border-color: #99ff00; }
+        .def-5 { color: #00ff44; border-color: #00ff44; }
+
+        .footer { text-align: center; font-size: 8px; color: #333; padding: 15px; border-top: 1px solid var(--border); }
+    </style>
+</head>
+<body>
+
+<div class="main-container">
+    <div class="tabs">
+        <div class="tab active" onclick="openTab('carichi', this)">📦 CARICHI</div>
+        <div class="tab" onclick="openTab('lavanderia', this)">🧼 LAVANDERIA</div>
+        <div class="tab" onclick="openTab('deposito', this)">🏦 DEPOSITO</div>
+    </div>
+
+    <!-- GUI 1: CARICHI -->
+    <div id="carichi" class="gui-content active">
+        <div class="header-title"><h1>LOGISTICA CARICHI</h1></div>
+        <span class="label">Fornitore</span>
+        <select id="org" oninput="calcCarico()">
+            <option value="11">GANG (Can $11)</option>
+            <option value="12">MAFIA (Can $12)</option>
+        </select>
+        <span class="label">Cannabis (Stack + Sfusi)</span>
+        <div class="row"><input type="number" id="cSt" placeholder="Stack" oninput="calcCarico()"><input type="number" id="cSf" placeholder="Sfusi" oninput="calcCarico()"></div>
+        <span class="label">Joint (Stack + Sfusi)</span>
+        <div class="row"><input type="number" id="jSt" placeholder="Stack" oninput="calcCarico()"><input type="number" id="jSf" placeholder="Sfusi" oninput="calcCarico()"></div>
+        <div style="margin-top:20px; display:flex; align-items:center; font-size:11px; color:var(--gold);">
+            <input type="checkbox" id="autoWash" onchange="calcCarico()" style="width:auto; margin-right:10px;"> SCONTO PULIZIA (-15%)
+        </div>
+        <div class="result-panel">
+            <div class="res-title">Totale da Pagare:</div>
+            <div class="res-value">$ <span id="valCarico">0</span></div>
+        </div>
+    </div>
+
+    <!-- GUI 2: LAVANDERIA -->
+    <div id="lavanderia" class="gui-content">
+        <div class="header-title"><h1>LAVANDERIA SOLDI</h1></div>
+        <span class="label">Cifra Sporca</span>
+        <input type="number" id="dirtyMoney" placeholder="Importo $" oninput="calcLava()">
+        <span class="label">Commissione %</span>
+        <input type="number" id="taxPerc" placeholder="Es. 20" oninput="calcLava()">
+        <div class="result-panel" style="border-left-color: #00ff44; background: rgba(0,255,0,0.05);">
+            <div class="res-title" style="color:#00ff44">Soldi Puliti:</div>
+            <div class="res-value">$ <span id="valLava">0</span></div>
+        </div>
+    </div>
+
+    <!-- GUI 3: DEPOSITO CARTELLO -->
+    <div id="deposito" class="gui-content">
+        <div class="header-title"><h1>DEPOSITO CARTELLO</h1></div>
+        
+        <span class="label">Gradi DEFCON (Stato Allerta)</span>
+        <select id="defcon" oninput="calcDepo()" style="background:#1a1a1a;">
+            <option value="1.05">DEFCON 1 (+5% Prezzo)</option>
+            <option value="0.95">DEFCON 2 (-5% Prezzo)</option>
+            <option value="0.90" selected>DEFCON 3 (-10% Prezzo)</option>
+            <option value="0.85">DEFCON 4 (-15% Prezzo)</option>
+            <option value="0.80">DEFCON 5 (-20% Prezzo)</option>
+        </select>
+
+        <span class="label">Quantità Cannabis (G)</span>
+        <input type="number" id="gCan" placeholder="Grammi Cannabis" oninput="calcDepo()">
+        <p style="font-size:9px; color:#555; margin:2px 0 10px;">Prezzo base: $22/g</p>
+
+        <span class="label">Quantità Joint (G)</span>
+        <input type="number" id="gJnt" placeholder="Grammi Joint" oninput="calcDepo()">
+        <p style="font-size:9px; color:#555; margin:2px 0 10px;">Prezzo base: $45/g</p>
+
+        <div class="result-panel" style="border-left-color: var(--gold); background: rgba(212,175,55,0.05);">
+            <div class="res-title" style="color:var(--gold)">VALORE VENDITA DEPOSITO:</div>
+            <div class="res-value">$ <span id="valDepo">0</span></div>
+        </div>
+    </div>
+
+    <div class="footer">NUEVA FRONTERA DATABASE v7.0 // SECURE LINE</div>
+</div>
+
+<script>
+    function openTab(tabId, el) {
+        var contents = document.getElementsByClassName('gui-content');
+        for (var i = 0; i < contents.length; i++) contents[i].classList.remove('active');
+        var tabs = document.getElementsByClassName('tab');
+        for (var i = 0; i < tabs.length; i++) tabs[i].classList.remove('active');
+        document.getElementById(tabId).classList.add('active');
+        el.classList.add('active');
+    }
+
+    function calcCarico() {
+        const pCan = parseInt(document.getElementById('org').value);
+        const cSt = parseInt(document.getElementById('cSt').value) || 0;
+        const cSf = parseInt(document.getElementById('cSf').value) || 0;
+        const jSt = parseInt(document.getElementById('jSt').value) || 0;
+        const jSf = parseInt(document.getElementById('jSf').value) || 0;
+        let total = ((cSt * 64) + cSf) * pCan + ((jSt * 64) + jSf) * 27;
+        if (document.getElementById('autoWash').checked) total *= 0.85;
+        document.getElementById('valCarico').innerText = Math.floor(total).toLocaleString();
+    }
+
+    function calcLava() {
+        const money = parseFloat(document.getElementById('dirtyMoney').value) || 0;
+        const tax = parseFloat(document.getElementById('taxPerc').value) || 0;
+        document.getElementById('valLava').innerText = Math.floor(money - (money * (tax / 100))).toLocaleString();
+    }
+
+    function calcDepo() {
+        const gCan = parseFloat(document.getElementById('gCan').value) || 0;
+        const gJnt = parseFloat(document.getElementById('gJnt').value) || 0;
+        const mod = parseFloat(document.getElementById('defcon').value);
+
+        // Prezzi base: Can 22, Jnt 45
+        let total = (gCan * 22) + (gJnt * 45);
+        total = total * mod; // Applica modificatore DEFCON
+
+        document.getElementById('valDepo').innerText = Math.floor(total).toLocaleString();
+    }
+</script>
+
+</body>
+</html>
